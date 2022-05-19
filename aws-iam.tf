@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "user_service" {
+/* data "aws_iam_policy_document" "user_service" {
   statement {
     actions = [
       "s3:ListBucket",
@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "user_service" {
   }
 }
 
-resource "aws_iam_policy" "user_service" {
+resource "aws_iam_policy" "data_services" {
 
   name = "${local.name_prefix}-user-service-sa"
 
@@ -37,11 +37,11 @@ resource "aws_iam_policy" "user_service" {
       RESOURCE_GROUP = "IAM"
     }
   )
-}
+} */
 
-resource "aws_iam_role" "user_service" {
+resource "aws_iam_role" "service_iam_role" {
 
-  name = "${local.name_prefix}-user-service-sa"
+  name = "${local.name_prefix}-data-services-sa"
 
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -54,7 +54,7 @@ resource "aws_iam_role" "user_service" {
         Action : "sts:AssumeRoleWithWebIdentity",
         Condition : {
           "StringEquals" : {
-            "${var.eks_oidc_provider_id}:sub" : "system:serviceaccount:${var.user_service_namespace}:${var.user_service_sa_name}"
+            "${var.eks_oidc_provider_id}:sub" : "system:serviceaccount:${var.service_namespace}:${var.service_account_name}"
           }
         }
       }
@@ -64,13 +64,13 @@ resource "aws_iam_role" "user_service" {
   tags = merge(
     local.tags,
     {
-      Name           = "${local.name_prefix}-user-service-sa"
+      Name           = "${local.name_prefix}-data-services-sa"
       RESOURCE_GROUP = "IAM"
     }
   )
 }
 
-resource "aws_iam_role_policy_attachment" "user_service" {
-  role       = aws_iam_role.user_service.name
-  policy_arn = aws_iam_policy.user_service.arn
-}
+/* resource "aws_iam_role_policy_attachment" "data-services" {
+  role       = aws_iam_role.data_services.name
+  policy_arn = aws_iam_policy.data_services.arn
+} */
